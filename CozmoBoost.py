@@ -1,5 +1,4 @@
-# Imports 
-#imports
+# imports
 import speech_recognition as sr
 import requests
 from PIL import Image
@@ -12,14 +11,12 @@ import asyncio
 from cozmo.util import degrees, speed_mmps, distance_mm
 
 
-#variables
+# variables
 now = datetime.now()
 hour = int(now.strftime('%I')) # this gives 12 hour time 
 minute = int(now.strftime('%M')) # This gives the minute
 am_pm = str(now.strftime('%p')) # this gives both and am and pm
 day = str(now.strftime('%A'))
-voice_assistant = False
-#begin_data
 voice_data = '' 
 voice_data2 = ''
 voice_data4 = ''
@@ -30,18 +27,6 @@ url = "http://www.bom.gov.au/places/sa/adelaide/"
 url2 = "https://www.worldometers.info/coronavirus/?utm_campaign=homeAdvegas1?"
 
 r = sr.Recognizer()
-'''
-def beign_audio():
-    global begin_speech
-    with sr.Microphone() as source1
-    audio1 = r.listen(source1)
-    try:
-        begin_speech = r.recognize_google(audio1)
-    except sr.UnknownValueError:
-        print('please try again')
-    except sr.RequestError:
-        print("sorry my speech service is down")
-    return begin_speech'''
 
 # Tutourial found for the voice commands at : https://www.youtube.com/watch?v=x8xjj6cR9Nc&t=867s&ab_channel=TraversyMedia
 def record_audio():
@@ -80,38 +65,12 @@ def respond(robot: cozmo.robot.Robot):
         print(potato)
         robot.drive_straight(distance_mm(potato), speed_mmps(100)).wait_for_completed()
         print("Command: move back")
-    '''if "wheelie" in voice_data:
-        print("it worked?")
-        look_around = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-
-    cube = None
-
-    try:
-        cube = robot.world.wait_for_observed_light_cube(timeout=30) #this waits for cozmo to spot one of cubes
-        print("Found cube", cube)
-
-    except asyncio.TimeoutError:
-        print("Didn't find a cube :-(")
-
-    finally:
-        look_around.stop()
-        # whether we find it or not, we want to stop the behavior
-        
-    if cube is None:
-        robot.play_anim_trigger(cozmo.anim.Triggers.MajorFail) #if the cube is not found 
-        return
     
-    print("Yay, found cube")
-    cube.set_lights(cozmo.lights.green_light.flash())
-    anim = robot.play_anim_trigger(cozmo.anim.Triggers.BlockReact)
-    anim.wait_for_completed()
-    action = robot.pop_a_wheelie(cube, num_retries=2)
-    action.wait_for_completed()'''
-    # code found at 
     if "stack" in voice_data:
+        #code found at: https://github.com/anki/cozmo-python-sdk/blob/master/examples/tutorials/04_cubes_and_objects/05_cube_stack.py
         print("it worked?")
         look_around = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-        cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=15) 
+        cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=30) # cozmo looks for cubes for both cubes for 30 seconds
         look_around.stop()
 
         if len(cubes) < 2:
@@ -120,18 +79,14 @@ def respond(robot: cozmo.robot.Robot):
             current_action = robot.pickup_object(cube[0], num_retries=3) # picks up the first cube
             current_action.wait_for_completed()
             if current_action.has_failed:
-                failreason = current_action.failure_reason
-                print(failreason)
+                print("oh no it failed")
                 return
         
-        #stacking cubes
-
+            #stacking attempts to stack both cubes
             current_action = robot.place_on_object(cubes[1], num_retries=3)
             current_action.wait_for_completed()
             if current_action.has_failed:
                 return
-    
-
     if 'time' in voice_data:
         print("telling time")
         if hour in range(1,12) and minute in range(0,60) and am_pm == "AM": # For am time 
@@ -158,7 +113,6 @@ def respond(robot: cozmo.robot.Robot):
         replaceweather = string_weather.replace('<li class="airT">', "").replace("</li>", "")
         print(replaceclimate)
         print(replaceweather)
-        str(weather)
         robot.say_text(f"the current temperature is {replaceweather} and it is {replaceclimate}", use_cozmo_voice=False, voice_pitch=0.8, duration_scalar=0.6).wait_for_completed()
     if 'active covid cases' in voice_data:
         page = requests.get(url2)
@@ -197,6 +151,8 @@ def respond(robot: cozmo.robot.Robot):
         robot.say_text("Voice commands is now shutting down", use_cozmo_voice=False, voice_pitch=0.8, duration_scalar=0.6).wait_for_completed()
         exit()
 
+# code found at: https://github.com/hunter-heidenreich/Cozmo-Scripts/blob/master/structured-tutorials/009-face_images.py
+# tutorial found at: https://www.youtube.com/watch?v=sUa3aF0dN_8&t=566s&ab_channel=CreatingHunterH
 
 def setup_position(robot: cozmo.robot.Robot):
     if robot.lift_height.distance_mm > 45:
@@ -223,12 +179,10 @@ def cozmo_boost_face(robot: cozmo.robot.Robot):
 
 
 def begin_speech(robot: cozmo.robot.Robot):
-    robot.say_text("How can I be of service").wait_for_completed()
+    robot.say_text("How can I be of service", use_cozmo_voice=False, voice_pitch=0.8, duration_scalar=0.6).wait_for_completed()
 
-
-#$cozmo.run_program(cozmo_boost_face)
-#time.sleep(5)
-#cozmo.run_program(begin_speech)
+cozmo.run_program(cozmo_boost_face)
+cozmo.run_program(begin_speech)
 
 
 time.sleep(1)
