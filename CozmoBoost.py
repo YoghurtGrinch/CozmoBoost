@@ -23,7 +23,7 @@ voice_data4 = ''
 joinn = ""
 joinn2 = ""
 
-url = "http://www.bom.gov.au/places/sa/adelaide/"
+url = "https://weather.com/weather/today/l/33.52,-86.80?par=google&temp=c" # change the link from weather.com for you your country
 url2 = "https://www.worldometers.info/coronavirus/?utm_campaign=homeAdvegas1?"
 
 r = sr.Recognizer()
@@ -43,10 +43,10 @@ def record_audio():
 
 
 def respond(robot: cozmo.robot.Robot):
-    global hour, minute, am_pm, voice_data, voice_data2, joinn, voice_data4
+    global hour, minute, am_pm, voice_data, voice_data2, joinn, voice_data4, url
     if "help" in voice_data:
         robot.say_text("opening my voice command list").wait_for_completed()
-        url3 = "http://www.bom.gov.au/places/sa/adelaide/"
+        url3 = "https://amall022.wixsite.com/cozmoboost"
         webbrowser.get().open(url3) # this opens to the website with the list of commands
     if 'move forward by ' in voice_data:
         voice_data, voice_data2 = voice_data.split('by')
@@ -101,19 +101,13 @@ def respond(robot: cozmo.robot.Robot):
     if 'turn left' in voice_data:
          robot.turn_in_place(degrees(-90)).wait_for_completed()
     if 'weather' in voice_data:
+        # webscraping tutorial found at: https://www.youtube.com/watch?v=xKukOMtPWwk&ab_channel=johangodinho
         print("telling weather")
-        global day, url
-        var = requests.get(url) 
-        soup = BeautifulSoup(var.content, 'html.parser') 
-        weather = soup.find('li', class_="airT") # finds the text within the class
-        climate = soup.find('dd', class_="summary")
-        string_weather = str(weather)
-        the_climate = str(climate) # converts to string
-        replaceclimate = the_climate.replace('<dd class="summary">', "").replace(".</dd>", "") # removes the tags 
-        replaceweather = string_weather.replace('<li class="airT">', "").replace("</li>", "")
-        print(replaceclimate)
-        print(replaceweather)
-        robot.say_text(f"the current temperature is {replaceweather} and it is {replaceclimate}", use_cozmo_voice=False, voice_pitch=0.8, duration_scalar=0.6).wait_for_completed()
+        var = requests.get(url)
+        soup1 = BeautifulSoup(var.content, 'html.parser')
+        weather = soup1.find('span', class_="CurrentConditions--tempValue--3KcTQ").text
+        print(weather)
+        robot.say_text(f"the current temperature is {weather}", use_cozmo_voice=False, voice_pitch=0.8, duration_scalar=0.6).wait_for_completed()
     if 'active covid cases' in voice_data:
         page = requests.get(url2)
         soup2 = BeautifulSoup(page.content, 'html.parser')
