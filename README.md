@@ -46,7 +46,7 @@
     <hr>
     <h4 align="left">Other Notes</h4>
     <p align="left">
-    Please bare with me if there are any bugs or if the update rollout is slow. If you are experiening bugs or would like to suggest a change please do so on <a href="https://github.com/YoghurtGrinch/QuackScan/issues">Issues</a>. I appreciate your patience!
+    Please bare with me if there are any bugs or if the update rollout is slow. If you are experiening bugs or would like to suggest a change please do so on <a href="https://github.com/YoghurtGrinch/CozmoBoost/issues">Issues</a>. I appreciate your patience!
     <br/>
     <br />
     <p>
